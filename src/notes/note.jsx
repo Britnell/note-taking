@@ -1,14 +1,34 @@
 import React, { useRef, useState } from "react";
 import { Dialog } from "@headlessui/react";
-// import UserSelect from "./userselect";
 import { useMutation } from "@tanstack/react-query";
 import { updateNote } from "./api";
 const UserSelect = React.lazy(() => import("./userselect"));
 
+const Mention = ({ username }) => (
+  <a
+    className={`text-blue-400 hover:text-blue-700 font-medium before:content-[" "] after:content-[" "] `}
+    href="#"
+  >
+    {username}
+  </a>
+);
+
+const Parser = ({ body }) => {
+  const _body = body
+    .split(" ")
+    .map((word) => (word[0] === "@" ? <Mention username={word} /> : word));
+  // this is more complex than hoped, supposed to .join(' ') together
+  //   but that doesnt work with jsx, need to join string elements only
+  return _body;
+};
+const pasteAt = (str, pos, paste) => str.slice(0, pos) + paste + str.slice(pos);
+
 export default function Note({ id, body }) {
+  // State for dialog & @user selection
   let [mentionDialog, setMentionDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
   const saveQuery = useMutation(updateNote);
+
   const timerRef = useRef();
   const cursorRef = useRef();
   const textRef = useRef();
@@ -17,15 +37,11 @@ export default function Note({ id, body }) {
     if (timerRef.current) clearTimeout(timerRef.current);
 
     timerRef.current = setTimeout(() => {
-      console.log(" autosave ", text);
       saveQuery.mutate({ id, body: text });
     }, 1000);
   };
 
   const cancel = () => setMentionDialog(false);
-
-  const pasteAt = (str, pos, paste) =>
-    str.slice(0, pos) + paste + str.slice(pos);
 
   const update = () => {
     const _text = pasteAt(
@@ -34,8 +50,9 @@ export default function Note({ id, body }) {
       `@${selectedUser.username}`
     );
     textRef.current.textContent = _text;
-
+    autosave();
     setMentionDialog(false);
+    // The parser does not parse newly added @mentions, need to store text in state and trigger re-render
   };
 
   // Autosave after user input
@@ -59,8 +76,11 @@ export default function Note({ id, body }) {
         onKeyDown={onKey}
         contentEditable
         ref={textRef}
-        dangerouslySetInnerHTML={{ __html: body }}
-      ></div>
+        // dangerouslySetInnerHTML={{ __html: body }}
+      >
+        <Parser body={body} />
+        {/* {body} */}
+      </div>
 
       <Dialog
         open={mentionDialog}
@@ -76,6 +96,7 @@ export default function Note({ id, body }) {
             <span className="text-blue-700 font-bold">@mention</span>&nbsp;
             another User
           </Dialog.Title>
+          {/* potentially expensive component, lazy load w dialog */}
           <React.Suspense fallback={<div>...</div>}>
             <UserSelect
               selectedUser={selectedUser}
