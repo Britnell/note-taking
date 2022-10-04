@@ -11,6 +11,7 @@ export default function Note({ id, body }) {
   const saveQuery = useMutation(updateNote);
   const timerRef = useRef();
   const cursorRef = useRef();
+  const textRef = useRef();
 
   const autosave = (text) => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -23,21 +24,27 @@ export default function Note({ id, body }) {
 
   const cancel = () => setMentionDialog(false);
 
+  const pasteAt = (str, pos, paste) =>
+    str.slice(0, pos) + paste + str.slice(pos);
+
   const update = () => {
+    const _text = pasteAt(
+      textRef.current.textContent,
+      cursorRef.current,
+      `@${selectedUser.username}`
+    );
+    textRef.current.textContent = _text;
+
     setMentionDialog(false);
-    console.log(" => mention user : ", selectedUser);
-    // This does  not work as the cursor position is lost...
   };
 
-  const onType = (ev) => {
-    const val = ev.target.textContent;
-    autosave(val);
-  };
+  // Autosave after user input
+  const onType = (ev) => autosave(ev.target.textContent);
 
+  // catch '@' key to open @mention modal
   const onKey = (ev) => {
     if (ev.key === "@") {
-      let pos = window.getSelection();
-      console.log(pos);
+      cursorRef.current = window.getSelection().focusOffset;
       setMentionDialog(true);
       ev.preventDefault();
     }
@@ -51,9 +58,9 @@ export default function Note({ id, body }) {
         onInput={onType}
         onKeyDown={onKey}
         contentEditable
-      >
-        {body}
-      </div>
+        ref={textRef}
+        dangerouslySetInnerHTML={{ __html: body }}
+      ></div>
 
       <Dialog
         open={mentionDialog}
@@ -83,12 +90,14 @@ export default function Note({ id, body }) {
             >
               cancel
             </button>
-            <button
-              className="py-1 px-2 rounded-sm bg-blue-200 hover:bg-blue-300"
-              onClick={update}
-            >
-              Add
-            </button>
+            {selectedUser?.username && (
+              <button
+                className="py-1 px-2 rounded-sm bg-blue-200 hover:bg-blue-300"
+                onClick={update}
+              >
+                Add
+              </button>
+            )}
           </div>
         </Dialog.Panel>
       </Dialog>

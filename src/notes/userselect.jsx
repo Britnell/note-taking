@@ -8,6 +8,8 @@ export default function UserSelect({ selectedUser, setSelectedUser }) {
 
   const filtered = users.slice(0, 5);
 
+  // TODO filter
+
   return (
     <>
       <Combobox value={selectedUser} onChange={setSelectedUser}>
