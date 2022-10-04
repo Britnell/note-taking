@@ -6,7 +6,6 @@ import { Combobox } from "@headlessui/react";
 export default function UserSelect({ selectedUser, setSelectedUser }) {
   const { data: users } = useQuery(["users"], getUsers);
 
-  console.log(" <select ", users[0]);
   return (
     <div>
       <Combobox value={selectedUser} onChange={setSelectedUser}>

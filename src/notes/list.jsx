@@ -6,8 +6,6 @@ import Note from "./note";
 export default function List() {
   const { data: notes } = useQuery(["notes"], getNotes);
 
-  console.log(notes);
-
   return (
     <div>
       {notes &&

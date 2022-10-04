@@ -24,7 +24,8 @@ export default function Note({ id, body }) {
   };
   const update = () => {
     setMentionDialog(false);
-    console.log(" => select ", selectedUser);
+    console.log(" => mention user : ", selectedUser);
+    // This does  not work as the cursor position is lost...
   };
 
   const onType = (ev) => {
@@ -32,10 +33,17 @@ export default function Note({ id, body }) {
     autosave(val);
   };
 
+  const onKey = (ev) => {
+    if (ev.key === "@") {
+      setMentionDialog(true);
+      ev.preventDefault();
+    }
+  };
+
   return (
     <div>
       <h3>Note {id}</h3>
-      <div onInput={onType} contentEditable>
+      <div onInput={onType} onKeyDown={onKey} contentEditable>
         {body}
       </div>
 
