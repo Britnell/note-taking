@@ -41,9 +41,14 @@ export default function Note({ id, body }) {
   };
 
   return (
-    <div>
-      <h3>Note {id}</h3>
-      <div onInput={onType} onKeyDown={onKey} contentEditable>
+    <div className=" shadow-lg p-2 rounded-sm min-h-[200px] flex flex-col">
+      <h3 className=" font-semibold">Note {id}</h3>
+      <div
+        className="p-1 flex-grow"
+        onInput={onType}
+        onKeyDown={onKey}
+        contentEditable
+      >
         {body}
       </div>
 
