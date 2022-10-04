@@ -1,27 +1,28 @@
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Dialog } from "@headlessui/react";
-import UserSelect from "./userselect";
+// import UserSelect from "./userselect";
 import { useMutation } from "@tanstack/react-query";
 import { updateNote } from "./api";
+const UserSelect = React.lazy(() => import("./userselect"));
 
 export default function Note({ id, body }) {
   let [mentionDialog, setMentionDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
   const saveQuery = useMutation(updateNote);
-  const timer = useRef();
+  const timerRef = useRef();
+  const cursorRef = useRef();
 
   const autosave = (text) => {
-    if (timer.current) clearTimeout(timer.current);
+    if (timerRef.current) clearTimeout(timerRef.current);
 
-    timer.current = setTimeout(() => {
+    timerRef.current = setTimeout(() => {
       console.log(" autosave ", text);
       saveQuery.mutate({ id, body: text });
     }, 1000);
   };
 
-  const cancel = () => {
-    setMentionDialog(false);
-  };
+  const cancel = () => setMentionDialog(false);
+
   const update = () => {
     setMentionDialog(false);
     console.log(" => mention user : ", selectedUser);
@@ -35,6 +36,8 @@ export default function Note({ id, body }) {
 
   const onKey = (ev) => {
     if (ev.key === "@") {
+      let pos = window.getSelection();
+      console.log(pos);
       setMentionDialog(true);
       ev.preventDefault();
     }
@@ -52,25 +55,43 @@ export default function Note({ id, body }) {
         {body}
       </div>
 
-      <Dialog open={mentionDialog} onClose={() => setMentionDialog(false)}>
-        <Dialog.Panel>
-          <Dialog.Title>@mention</Dialog.Title>
-          <UserSelect
-            selectedUser={selectedUser}
-            setSelectedUser={setSelectedUser}
-          />
-          <button onClick={cancel}>cancel</button>
-          <button onClick={update}>Add</button>
+      <Dialog
+        open={mentionDialog}
+        onClose={() => setMentionDialog(false)}
+        className={
+          "bg-white p-8 border-2 border-blue-300 rounded-lg shadow-lg" +
+          " absolute left-1/2 top-1/2  w-[400px] min-h-[250px] translate-x-[-50%] translate-y-[-50%] " +
+          "flex flex-col"
+        }
+      >
+        <Dialog.Panel className="flex flex-col flex-grow">
+          <Dialog.Title className="">
+            <span className="text-blue-700 font-bold">@mention</span>&nbsp;
+            another User
+          </Dialog.Title>
+          <React.Suspense fallback={<div>...</div>}>
+            <UserSelect
+              selectedUser={selectedUser}
+              setSelectedUser={setSelectedUser}
+            />
+          </React.Suspense>
+          <div className="flex-grow first-line:"></div>
+          <div className="flex gap-4">
+            <button
+              onClick={cancel}
+              className="py-1 px-2 rounded-sm bg-gray-200 hover:bg-gray-300"
+            >
+              cancel
+            </button>
+            <button
+              className="py-1 px-2 rounded-sm bg-blue-200 hover:bg-blue-300"
+              onClick={update}
+            >
+              Add
+            </button>
+          </div>
         </Dialog.Panel>
       </Dialog>
     </div>
   );
 }
-
-const onKey = (ev) => {
-  // console.log(ev.key);
-  // if (ev.key === "@") {
-  //   setMentionDialog(true);
-  //   ev.preventDefault();
-  // }
-};

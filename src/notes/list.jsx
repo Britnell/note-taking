@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { getNotes } from "./api";
+
+import CreateNew from "./create";
 import Note from "./note";
 
 export default function List() {
@@ -12,6 +14,7 @@ export default function List() {
         notes?.map((note) => (
           <Note key={note.id} id={note.id} body={note.body} />
         ))}
+      <CreateNew />
     </div>
   );
 }

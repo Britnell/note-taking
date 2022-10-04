@@ -13,8 +13,12 @@ const CreateNew = () => {
   const create = () => createQuery.mutate();
 
   return (
-    <div>
-      <button onClick={create}>Add +</button>
+    <div className=" shadow-lg p-2 rounded-sm min-h-[200px] flex flex-col items-center">
+      <h3>Create new</h3>
+      <button onClick={create} className=" w-1/2 h-1/2 bg-gray-200">
+        {" "}
+        +
+      </button>
     </div>
   );
 };

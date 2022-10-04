@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getNotes, getUsers } from "./notes/api";
 import "./App.css";
-import CreateNew from "./notes/create";
 import List from "./notes/list";
 
 function App() {
@@ -15,9 +14,7 @@ function App() {
         <h2>YOur notes</h2>
         <List />
       </div>
-      <div>
-        <CreateNew />
-      </div>
+      <div></div>
     </div>
   );
 }

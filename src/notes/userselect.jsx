@@ -6,38 +6,29 @@ import { Combobox } from "@headlessui/react";
 export default function UserSelect({ selectedUser, setSelectedUser }) {
   const { data: users } = useQuery(["users"], getUsers);
 
+  const filtered = users.slice(0, 5);
+
   return (
-    <div>
+    <>
       <Combobox value={selectedUser} onChange={setSelectedUser}>
+        <Combobox.Label>Find :</Combobox.Label>
         <Combobox.Input
           onChange={(event) => setQuery(event.target.value)}
           displayValue={(person) => person?.username}
+          className="py-1 px-4 border-2 text-lg font-medium"
         />
         <Combobox.Options>
-          {users.map((user) => (
+          {filtered.map((user) => (
             <Combobox.Option key={user.username} value={user}>
               {({ active, selected }) => (
-                <li className={active ? " bg-blue-200 " : ""}>
-                  {selected ? `[x]` : `[ ]`}
+                <li className={"py-1 px-2" + (active ? " bg-blue-200 " : "")}>
                   {user.username}
                 </li>
               )}
             </Combobox.Option>
           ))}
-          {/* {people.map((person) => (
-            <Combobox.Option key={person.id} value={person}>
-              {person.name}
-              {({ active, selected }) => (
-                <div style={{ color: active ? "blue" : "black" }}>
-                  {selected ? `[x]` : `[ ]`}
-                  {person.name}
-                </div>
-              )} 
-                </Combobox.Option>
-            ))}
-              */}
         </Combobox.Options>
       </Combobox>
-    </div>
+    </>
   );
 }
