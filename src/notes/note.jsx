@@ -15,7 +15,7 @@ const Mention = ({ username }) => (
 
 const Parser = ({ body }) => {
   const _body = body
-    .split(" ")
+    .split(/[\s]/)
     .map((word) => (word[0] === "@" ? <Mention username={word} /> : word));
   // this is more complex than hoped, supposed to .join(' ') together
   //   but that doesnt work with jsx, need to join string elements only
